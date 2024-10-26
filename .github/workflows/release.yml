@@ -27,6 +27,7 @@ jobs:
 
       - name: Build DEB Package
         run: |
+          cd REPO
           export DEBFULLNAME="Glaolle"
           export DEBEMAIL="glaolle@gmail.com"
           cd ./haspd-aksparlnx-dkms
