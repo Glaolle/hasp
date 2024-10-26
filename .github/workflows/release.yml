@@ -30,11 +30,21 @@ jobs:
 
       - name: Build DEB Package
         run: |
-          sudo apt install devscripts build-essential lintian dkms debhelper -y
+          sudo apt install devscripts build-essential lintian dkms debhelper libjansson-dev -y
           cd REPO
           export DEBFULLNAME="Glaolle"
           export DEBEMAIL="glaolle@gmail.com"
           cd ./haspd-aksparlnx-dkms
+          debuild -us -uc -tc -b
+          cd ..
+          dpkg-deb --build ./haspd haspd_8.53-ubuntu_amd64.deb
+          cd ./usb-vhci-hcd-dkms
+          debuild -us -uc -tc -b
+          cd ..
+          cd ./libusb-vhci
+          debuild -us -uc -tc -b
+          cd ..
+          cd ./usbhaspd
           debuild -us -uc -tc -b
           cd ..
           rm -f *.build* *.changes
