@@ -27,7 +27,7 @@ jobs:
 
       - name: Build DEB Package
         run: |
-          sudo apt install devscripts build-essential lintian -y
+          sudo apt install devscripts build-essential lintian dkms -y
           cd REPO
           export DEBFULLNAME="Glaolle"
           export DEBEMAIL="glaolle@gmail.com"
