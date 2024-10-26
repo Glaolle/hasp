@@ -1,6 +1,6 @@
 Source: haspd-aksparlnx-dkms
 Maintainer: Glaolle <glaolle@gmail.com>
-Build-Depends: debhelper (>= 9), dkms
+Build-Depends: dkms
 
 Package: haspd-aksparlnx-dkms
 Architecture: all
