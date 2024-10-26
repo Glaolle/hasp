@@ -25,6 +25,9 @@ jobs:
         with:
           path: "REPO"
 
+      - name: Make Directory Structure
+        run: mkdir -p release
+
       - name: Build DEB Package
         run: |
           sudo apt install devscripts build-essential lintian dkms debhelper -y
