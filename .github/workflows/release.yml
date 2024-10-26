@@ -43,7 +43,9 @@ jobs:
           #dpkg-deb --build SOURCES/${GITHUB_REPO_NAME} "${{ env.GITHUB_REPO_NAME }}_${{ env.VERSION }}_${{ env.DEB_ARCHITECTURE }}.deb"
 
       - name: Confirm builds complete
-        run: sudo install -m 644 -o runner -g runner $(find . -type f -name *.deb && find . -type f -name *.rpm) release/
+        run: |
+          ls
+          sudo install -m 644 -o runner -g runner $(find . -type f -name *.deb) release/
 
       - name: Release
         uses: softprops/action-gh-release@v2
