@@ -1,0 +1,26 @@
+name: Run the Release
+
+permissions:
+  contents: write
+
+jobs:
+  Create_Packages:
+    name: Create Packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          path: "REPO"
+
+      - name: Build DEB Package
+        run: |
+          dpkg-deb --build SOURCES/${GITHUB_REPO_NAME} "${{ env.GITHUB_REPO_NAME }}_${{ env.VERSION }}_${{ env.DEB_ARCHITECTURE }}.deb"
+
+      - name: Confirm builds complete
+        run: sudo install -m 644 -o runner -g runner $(find . -type f -name *.deb && find . -type f -name *.rpm) release/
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release/*
