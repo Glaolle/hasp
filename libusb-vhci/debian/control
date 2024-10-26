@@ -1,7 +1,7 @@
 Source: libusb-vhci
 Maintainer: Glaolle <glaolle@gmail.com>
 Priority: optional
-Build-Depends: debhelper (>= 9)
+#Build-Depends: debhelper (>= 9)
 Section: libs
 
 Package: libusb-vhci-dev
