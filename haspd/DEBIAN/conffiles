@@ -1,0 +1,10 @@
+/etc/hasplm/templates/de.19.0.alp
+/etc/hasplm/templates/es.19.0.alp
+/etc/hasplm/templates/fr.19.0.alp
+/etc/hasplm/templates/it.19.0.alp
+/etc/hasplm/templates/ja.19.0.alp
+/etc/hasplm/templates/ru.19.0.alp
+/etc/hasplm/templates/zh-CN.19.0.alp
+/etc/hasplm/hasplm.ini
+/etc/init.d/haspd
+/etc/sysconfig/haspd

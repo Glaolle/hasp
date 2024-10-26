@@ -1,0 +1,11 @@
+Source: haspd-aksparlnx-dkms
+Maintainer: Glaolle <glaolle@gmail.com>
+Build-Depends: debhelper (>= 9), dkms
+
+Package: haspd-aksparlnx-dkms
+Architecture: all
+Priority: optional
+Section: kernel
+Depends: dkms (>= 1.95), linux-headers-generic, ${misc:Depends}
+Description: DKMS source for the aksparlnx driver
+ aksparlnx provides support for HASP LPT key.

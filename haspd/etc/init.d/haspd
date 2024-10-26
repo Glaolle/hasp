@@ -1,0 +1,237 @@
+#!/bin/sh
+# Author: Vitaly Lipatov <lav@etersoft.ru>
+# 2006, 2007, 2008, 2010, 2015, 2021 Public domain
+
+# chkconfig: 345 70 60
+# description: HASP keys support
+#
+# processnames: aksusbd, hasplmd
+#
+### BEGIN INIT INFO
+# Provides: haspd
+# Required-Start: $syslog
+# Required-Stop:
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Hasp keys support
+# Description: starts aksusbd and hasplmd services
+### END INIT INFO
+
+HASPLM_ARGS="-c /etc/haspd/hasplm.conf"
+# this version will filled from spec version during build
+export MODULEVERSION=8.53-eter1ubuntu
+
+# copied from /etc/init.d/functions
+SourceIfNotEmpty()
+{
+	local f
+	f="$1"
+	shift
+	[ -s "$f" ] && . "$f" "$@"
+}
+
+
+HASPLMD_ARGS="-s"
+SourceIfNotEmpty /etc/sysconfig/haspd
+
+OUTFORMAT=/etc/init.d/outformat
+[ -x $OUTFORMAT ] || OUTFORMAT=/etc/init.d/haspd.outformat
+
+if which tput >/dev/null && test -x $OUTFORMAT ; then
+	. $OUTFORMAT
+else
+	MOVE_TO_COL(){ :; }
+	SETCOLOR_SUCCESS(){ :; }
+	SETCOLOR_FAILURE(){ :; }
+	SETCOLOR_WARNING(){ :; }
+	SETCOLOR_NORMAL(){ :; }
+fi
+
+# TODO: use printf?
+success()
+{
+	MOVE_TO_COL
+	echo -n '[ '
+	SETCOLOR_SUCCESS
+	echo -n 'DONE'
+	SETCOLOR_NORMAL
+	echo ' ]'
+}
+
+failure()
+{
+	MOVE_TO_COL
+	echo -n '['
+	SETCOLOR_FAILURE
+	echo -n 'FAILED'
+	SETCOLOR_NORMAL
+	echo ']'
+}
+
+passed()
+{
+	MOVE_TO_COL
+	echo -n '['
+	SETCOLOR_WARNING
+	echo -n 'PASSED'
+	SETCOLOR_NORMAL
+	echo ']'
+}
+
+skipping()
+{
+	MOVE_TO_COL
+	echo -n '['
+	SETCOLOR_SUCCESS
+	echo -n 'SKIPPING'
+	SETCOLOR_NORMAL
+	echo ']'
+}
+
+get_pid()
+{
+	# TODO: use pgrep
+	PIDOF=/bin/pidof
+	if [ -x $PIDOF ] ; then
+		dpid=`$PIDOF $1`
+	else
+		dpid="$(ps axh | grep $1 | grep -v grep | sed -e 's/ *\(.*\)/\1/' -e 's/ \+/ /g' | grep -v " /bin/sh " | grep -v "^$$ " |  cut -f1 -d\  | head -1)"
+	fi
+	test -n "$dpid"
+}
+
+is_loaded()
+{
+    get_pid $1
+    test -n "$dpid"
+}
+
+
+check_debugfs()
+{
+    test -r "$1" && return
+    echo -n "Mount debugfs to /sys/kernel/debug"
+    mount -t debugfs debugfs /sys/kernel/debug || { failure ; return ; }
+    test -r "$1" && success || { echo "$1 still missed" ; failure ; }
+}
+
+start_inservice()
+{
+	SERVICE=$1
+	shift
+        echo -n "Running $SERVICE... "
+        is_loaded $SERVICE && passed && return
+	if which $SERVICE >/dev/null 2>/dev/null ; then
+	        $SERVICE $@ || { failure ; exit 1 ; }
+		success
+	else
+		skipping
+	fi
+}
+
+start()
+{
+	start_inservice aksusbd
+	start_inservice hasplm $HASPLM_ARGS
+	start_inservice hasplmd $HASPLMD_ARGS
+
+	MISCOMPILED=
+	DETECT=$(usbkeytest --detect) || MISCOMPILED=1
+
+	# if could'nt compile usbkeytest during build, run all
+	if [ -n "$MISCOMPILED" ] ; then
+		echo "We have no built usbkeytest, so run all possible services"
+		DETECT="eutron sentinel"
+	fi
+
+	for i in $DETECT ; do
+		case $i in
+			aladdin)
+#				echo "HASP key present"
+				;;
+			*)
+				echo "Unknown key $i"
+				;;
+		esac
+	done
+
+}
+
+# kill specified process
+stopping()
+{
+	is_loaded $1 || { passed ; return ; }
+	# usual way
+	kill $dpid
+	for pau in 1 2 3 4 ; do
+		is_loaded $1 || { success ; return ; }
+		echo -n "."
+		# 0.5 do not work only on Special Linux
+		sleep 1
+	done
+	# kill immediately (brokes skeyd semget, FM: id get with fot)
+	kill -KILL $dpid
+	for pau in 1 2 3 ; do
+		is_loaded $1 || { success ; return ; }
+		echo -n "."
+		# 0.5 do not work only on Special Linux
+		sleep 1
+	done
+	failure
+}
+
+stop()
+{
+    for i in hasplmd hasplm aksusbd ; do
+        echo -n "Stopping $i... "
+	stopping $i
+    done
+
+    success
+
+}
+
+status()
+{
+	echo "Hardware protection keys support bundle. Etersoft (c) 2008-2016, 2021"
+	echo "HASPD package $MODULEVERSION"
+	
+	for i in aksusbd hasplm hasplmd; do
+		is_loaded $i && echo "    $i is running" || echo "    $i is stopped"
+	done
+	is_loaded aksusbd && aksusbd -v
+
+	echo
+	echo
+	echo "Use \$ eterkeytest [--hasp] [--sentinel] [--eutron] (WINE@Etersoft only)"
+	echo "or \$ usbkeytest [--list] for test key presence"
+}
+
+restart()
+{
+    stop
+    start
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    condstop|stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    status)
+        status
+        ;;
+    condrestart)
+        # only restart if it is already running
+        # TODO: more correctly
+        is_loaded aksusbd && restart
+        ;;
+    *)
+        echo "Usage: haspd {start|stop|restart|condrestart|condstop|status}"
+esac
+

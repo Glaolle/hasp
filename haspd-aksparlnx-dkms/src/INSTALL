@@ -1,0 +1,250 @@
+
+Aladdin key driver and daemon installation instructions
+=======================================================
+
+To enable hardware key access, a kernel mode driver (either
+aksparlnx.o or aksparlnx.ko) plus the aksusbd daemon have to
+be loaded.
+
+All actions described below should be executed as root.
+
+
+Driver compilation (aksparlnx.o/aksparlnx.ko)
+---------------------------------------------
+
+The aksparlnx driver is provided as a set of .c and .h files, and one
+precompiled binary file. To make an executable version of the driver,
+the files have to be compiled and linked.
+
+To compile and install the driver use the following command in the
+distribution directory:
+
+	./build.sh --install
+
+A kernel module will be installed in the following directory:
+/lib/modules/<kernel version>/misc
+
+If the operation fails, refer to the "Common problems" section of this
+document.
+
+
+Driver installation (aksparlnx.o/aksparlnx.ko)
+----------------------------------------------
+
+1. Generating the Device Node
+
+To make the driver accessible, the /dev/Hardlock device node has to be
+generated, specifying the same major number used to load the driver
+(major=xxx command line to insmod, or 42 default).
+
+The device node is generated with the following command:
+
+	mknod /dev/Hardlock c 42 0
+
+To set access mode to the node as "allow everyone":
+
+	chmod 666 /dev/Hardlock
+
+If you want to restrict access to Aladdin keys to a particular group of
+users (e.g. group aladdin):
+
+	chgrp aladdin /dev/Hardlock
+	chmod 660 /dev/Hardlock
+
+
+2. Loading the Driver
+
+Load the aksparlnx driver with the following command:
+
+	modprobe aksparlnx
+
+If the driver is successfully loaded, a system log message is
+generated as shown in the example below:
+
+	Feb  2 12:16:01 panther kernel: aksparlnx: EYE/HASP driver v1.01/API v3.77/major 42 loaded (ppi)
+
+If the driver fails to load, an error message is generated in the
+system log. Please refer to the "Common problems" section of this
+document.
+
+The loading of the driver can be incorporated into a startup script,
+so that the driver is readily available.
+
+
+Aladdin daemon (aksusbd)
+------------------------
+
+To enable the the daemon to access USB keys, the USB filesystem
+(usbdevfs/usbfs) must be mounted on /proc/bus/usb.
+On newer Linux distributions the USB filesystem is mounted
+automatically (e.g SuSe 8.0).
+It can be manually mounted with the command:
+
+	mount -t usbdevfs none /proc/bus/usb
+
+In order for the daemon to access parallel port keys, the aksparlnx
+kernel driver must be already loaded before starting the daemon.
+
+To load the daemon you must start it:
+
+	<path>/aksusbd
+
+The daemon will fork itself and run in background mode. Successful
+installation can be verified in the syslog as shown in the example
+below:
+
+	Feb  2 12:42:43 panther aksusbd:[21772]: loaded, daemon version: 1.00, key API (USB) version: 3.77, key API (parallel) version: 3.77
+
+The log entry includes the daemon version, the version of the API used
+for USB access, and the version of the API contained inside the kernel
+driver.
+
+If the kernel driver is unavailable when the daemon is launched,
+parallel port keys cannot be accessed, but USB keys are still
+accessible. This is reflected in the system log:
+
+	Feb  2 12:46:11 panther aksusbd:[21789]: loaded, daemon version: 1.00, key API (USB) version: 3.77 (parallel driver not available)
+
+The loading of the daemon can be incorporated into a startup script,
+so that the daemon is readily available.
+
+
+
+Usage options for aksparlnx.o/aksparlnx.ko
+------------------------------------------
+
+Diagnostic message types:
+-------------------------
+You can use the "loglevel" option to select which types of diagnostic
+messages will be issued by the driver. Possible values are:
+
+	0 - nothing, only errors are issued
+	1 - normal (default)
+	2 - verbose
+	3 - ultra verbose
+
+The messages are logged in the system log and given either kern.info
+or kern.debug priority. Refer to /etc/syslog.conf to verify where the
+messages are filed. Usually messages are filed in: /var/log/messages
+
+Example of loglevel usage:
+
+	insmod aksparlnx.o loglevel=2
+
+
+Modifying device major number:
+------------------------------
+By default the driver uses device major number 42. You can change the
+number by using the following command:
+
+	insmod aksparlnx.o major=123
+
+You have to reflect the new number in the driver special file:
+
+	mknod /dev/Hardlock c 123 0
+
+
+Port addresses:
+---------------
+If a parallel port in the system has not been detected by the Linux
+parport driver, you can inform aksparlnx.o about this port:
+
+	insmod aksparlnx.o hlportaddress=0x278
+
+CAUTION: Specifying an illegal port address may crash the system!
+
+
+Timeout:
+--------
+You can set the maximum amount of time for the driver to wait after
+requesting exclusive port access from the parport driver. The value
+used is 1/100 of a second. The default value is 100 (= 1 second).
+
+	insmod aksparlnx.o timeout=500
+
+After ths specified time (in this example 5 seconds) elapses and no
+port access has been granted, the request will be aborted, and a
+PORT_BUSY error will be returned.
+
+
+
+Usage options for aksusbd
+-------------------------
+
+Diagnostic message types:
+-------------------------
+You can use the -l option to select which types of diagnostic messages
+will be issued by the daemon. Possible values are:
+
+	0 - nothing, only errors are issued
+	1 - normal (default)
+	2 - verbose
+	3 - ultra verbose
+
+The messages are logged in the system log and given either daemon.info
+or daemon.debug priority. Refer to /etc/syslog.conf to verify where
+the messages are filed. Usually messages are filed in:
+/var/log/messages
+
+Example:
+
+	aksusbd -l 2
+
+
+Permissions:
+------------
+The Unix domain socket /tmp/.aksusb is used by applications to access
+the daemon. By default, the socket is created with permissions
+666. You can set aksusbd to use different permissions:
+
+	aksusbd -u 660
+
+
+Common problems
+---------------
+
+Driver compilation
+------------------
+
+   - Problem: kernel sources not found
+
+     The Linux sources of the running kernel are required for
+     compiling the driver. Install the kernel sources and try again.
+
+   - Problem: aksparlnx RPM package is detected
+
+     You cannot combine a manual and an RPM installation of
+     aksparlnx. Please uninstall the RPM package and try again.
+
+
+Driver installation
+-------------------
+
+   - Problem: modprobe aborts and issues a "kernel-module version
+	      mismatch" message
+
+     The installed kernel sources are not properly configured to work
+     with the running kernel. This could happen for example when using
+     a SMP machine running SuSE 8.2. The installed kernel sources are
+     configured for a uniprocessor machine, but the SMP kernel is
+     running.
+
+     To avoid this situation, follow the procedure below:
+
+	1. Copy the correct kernel configuration file
+	   (/boot/vmlinuz.config if you are using SuSE) to the kernel
+	   source directory.
+
+	2. Rename the file as .config.
+
+	3. Execute "make oldconfig" in the kernel source directory.
+
+	4. Remove the installed aksparlnx module.
+		./build.sh --remove
+
+	5. Recompile the aksparlnx module.
+		make clean
+		./build.sh --install
+
+
+Aladdin Knowledge Systems Ltd. (c) 1985 - 2005. All rights reserved

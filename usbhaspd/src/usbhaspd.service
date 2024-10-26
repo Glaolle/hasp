@@ -1,0 +1,10 @@
+[Unit]
+Description=USB HASP Emulator daemon
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/sh -c 'find /etc/usbhasp.d -name "*.json" | xargs /usr/sbin/usbhasp'
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

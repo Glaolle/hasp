@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+
+#export DH_VERBOSE=1
+
+export DEB_CXXFLAGS_MAINT_APPEND = -std=c++11
+include /usr/share/dpkg/pkg-info.mk
+
+DEB_CONFIGURE_EXTRA_FLAGS = --libdir="\$${prefix}/lib/$(DEB_HOST_MULTIARCH)"
+
+%:
+	dh $@ --with systemd
+
+override_dh_install:
+	cd $(CURDIR)/src && make
+	dh_install src/usbhaspd.service /etc/systemd/system/
+	dh_install src/dist/Release/GNU-Linux/usbhasp /usr/bin/
+
+#override_dh_auto_clean:

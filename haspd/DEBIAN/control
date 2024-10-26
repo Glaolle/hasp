@@ -1,0 +1,14 @@
+Package: haspd
+Version: 8.53
+Architecture: amd64
+Maintainer: root <root@100c87626e0a>
+Depends: coreutils, debianutils, mount, udev
+Priority: extra
+Multi-Arch: foreign
+Description: Hardware key protection drivers and license managers
+ HASP - Hardware Against Software Piracy
+ .
+ The package contains
+ * Sentinel LDK runtime supporting Sentinel, Sentinel HL, HASP 4, and Hardlock keys.
+ .
+ (c) 2022 SafeNet, Inc. All rights reserved.
