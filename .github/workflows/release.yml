@@ -45,8 +45,7 @@ jobs:
           debuild -us -uc -tc -b
           cd ..
           
-          sudo dpkg -i ./usb-vhci*.deb
-          cat /var/lib/dkms/usb-vhci-hcd/1.15.1/build/make.log
+          sudo dpkg --unpack ./usb-vhci*.deb
           cd ./libusb-vhci
           debuild -us -uc -tc -b
           cd ..
