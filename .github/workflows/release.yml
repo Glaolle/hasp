@@ -45,12 +45,12 @@ jobs:
           debuild -us -uc -tc -b
           cd ..
           
-          dpkg -i ./usb-vhci*.deb
+          sudo dpkg -i ./usb-vhci*.deb
           cd ./libusb-vhci
           debuild -us -uc -tc -b
           cd ..
 
-          #dpkg -i ./libusb-vhci*.deb
+          #sudo dpkg -i ./libusb-vhci*.deb
           cd ./usbhaspd
           #debuild -us -uc -tc -b
           cd ..
