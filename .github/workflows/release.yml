@@ -44,9 +44,10 @@ jobs:
           #cd ./libusb-vhci
           #debuild -us -uc -tc -b
           #cd ..
-          cd ./usbhaspd
-          debuild -us -uc -tc -b
-          cd ..
+          #dpkg -i libusb-vhci*.deb
+          #cd ./usbhaspd
+          #debuild -us -uc -tc -b
+          #cd ..
           rm -f *.build* *.changes
           unset DEBEMAIL
           unset DEBFULLNAME
