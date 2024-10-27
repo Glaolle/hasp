@@ -34,19 +34,23 @@ jobs:
           cd REPO
           export DEBFULLNAME="Glaolle"
           export DEBEMAIL="glaolle@gmail.com"
+          
           cd ./haspd-aksparlnx-dkms
           #debuild -us -uc -tc -b
           cd ..
+          
           #dpkg-deb --build ./haspd haspd_8.53-ubuntu_amd64.deb
+          
           cd ./usb-vhci-hcd-dkms
-          #debuild -us -uc -tc -b
+          debuild -us -uc -tc -b
           cd ..
-
+          
+          dpkg -i ./usb-vhci*.deb
           cd ./libusb-vhci
           debuild -us -uc -tc -b
           cd ..
 
-          #dpkg -i libusb-vhci*.deb
+          #dpkg -i ./libusb-vhci*.deb
           cd ./usbhaspd
           #debuild -us -uc -tc -b
           cd ..
