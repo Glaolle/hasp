@@ -41,9 +41,9 @@ jobs:
           cd ./usb-vhci-hcd-dkms
           debuild -us -uc -tc -b
           cd ..
-          cd ./libusb-vhci
-          debuild -us -uc -tc -b
-          cd ..
+          #cd ./libusb-vhci
+          #debuild -us -uc -tc -b
+          #cd ..
           cd ./usbhaspd
           debuild -us -uc -tc -b
           cd ..
