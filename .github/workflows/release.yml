@@ -55,9 +55,10 @@ jobs:
 
       - name: Confirm builds complete
         run: |
-          cd REPO
-          ls
-          sudo install -m 644 -o runner -g runner $(find . -type f -name *.deb) ../release/
+          #cd REPO
+          #ls
+          #sudo install -m 644 -o runner -g runner $(find . -type f -name *.deb) ../release/
+          sudo install -m 644 -o runner -g runner $(find ./REPO -type f -name *.deb) release/
 
       - name: Release
         uses: softprops/action-gh-release@v2
