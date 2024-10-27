@@ -35,19 +35,21 @@ jobs:
           export DEBFULLNAME="Glaolle"
           export DEBEMAIL="glaolle@gmail.com"
           cd ./haspd-aksparlnx-dkms
-          debuild -us -uc -tc -b
+          #debuild -us -uc -tc -b
           cd ..
-          dpkg-deb --build ./haspd haspd_8.53-ubuntu_amd64.deb
+          #dpkg-deb --build ./haspd haspd_8.53-ubuntu_amd64.deb
           cd ./usb-vhci-hcd-dkms
+          #debuild -us -uc -tc -b
+          cd ..
+
+          cd ./libusb-vhci
           debuild -us -uc -tc -b
           cd ..
-          #cd ./libusb-vhci
-          #debuild -us -uc -tc -b
-          #cd ..
+
           #dpkg -i libusb-vhci*.deb
-          #cd ./usbhaspd
+          cd ./usbhaspd
           #debuild -us -uc -tc -b
-          #cd ..
+          cd ..
           rm -f *.build* *.changes
           unset DEBEMAIL
           unset DEBFULLNAME
@@ -55,9 +57,6 @@ jobs:
 
       - name: Confirm builds complete
         run: |
-          #cd REPO
-          #ls
-          #sudo install -m 644 -o runner -g runner $(find . -type f -name *.deb) ../release/
           sudo install -m 644 -o runner -g runner $(find ./REPO -type f -name *.deb) release/
 
       - name: Release
