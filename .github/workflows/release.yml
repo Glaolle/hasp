@@ -36,10 +36,10 @@ jobs:
           export DEBEMAIL="glaolle@gmail.com"
           
           cd ./haspd-aksparlnx-dkms
-          #debuild -us -uc -tc -b
+          debuild -us -uc -tc -b
           cd ..
           
-          #dpkg-deb --build ./haspd haspd_8.53-ubuntu_amd64.deb
+          dpkg-deb --build ./haspd haspd_8.53-ubuntu_amd64.deb
           
           cd ./usb-vhci-hcd-dkms
           debuild -us -uc -tc -b
@@ -50,9 +50,9 @@ jobs:
           debuild -us -uc -tc -b
           cd ..
 
-          #sudo dpkg -i ./libusb-vhci*.deb
+          sudo dpkg -i ./libusb-vhci*.deb
           cd ./usbhaspd
-          #debuild -us -uc -tc -b
+          debuild -us -uc -tc -b
           cd ..
           rm -f *.build* *.changes
           unset DEBEMAIL
