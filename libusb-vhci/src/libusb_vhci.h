@@ -153,9 +153,9 @@ uint8_t usb_vhci_port_stat_triggers(const struct usb_vhci_port_stat *stat,
 
 // for converting status codes
 int usb_vhci_to_errno(int32_t status, uint8_t iso_urb) _LIB_USB_VHCI_NOTHROW;
-int32_t usb_vhci_from_errno(int errno, uint8_t iso_urb) _LIB_USB_VHCI_NOTHROW;
+int32_t usb_vhci_from_errno(int errnumber, uint8_t iso_urb) _LIB_USB_VHCI_NOTHROW;
 int usb_vhci_to_iso_packets_errno(int32_t status) _LIB_USB_VHCI_NOTHROW;
-int32_t usb_vhci_from_iso_packets_errno(int errno) _LIB_USB_VHCI_NOTHROW;
+int32_t usb_vhci_from_iso_packets_errno(int errnumber) _LIB_USB_VHCI_NOTHROW;
 
 #ifdef __cplusplus
 } // extern "C"
