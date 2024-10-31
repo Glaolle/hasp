@@ -283,6 +283,7 @@ int main()
 			}
 			else if(usb::vhci::cancel_urb_work* cuw = dynamic_cast<usb::vhci::cancel_urb_work*>(work))
 			{
+				delete cuw;
 				std::cout << "got cancel urb work" << std::endl;
 			}
 			else
