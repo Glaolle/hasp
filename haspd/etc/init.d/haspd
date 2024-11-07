@@ -1,11 +1,12 @@
 #!/bin/sh
 # Author: Vitaly Lipatov <lav@etersoft.ru>
-# 2006, 2007, 2008, 2010, 2015, 2021 Public domain
+# 2006, 2007, 2008, 2010, 2015 Public domain
 
 # chkconfig: 345 70 60
-# description: HASP keys support
+# description: Hasp keys support
 #
-# processnames: aksusbd, hasplmd
+# modulename: aksparlnx
+# processnames: winehasp, aksusbd, hasplm, usbdaemon, SntlKeysSrvrlnx
 #
 ### BEGIN INIT INFO
 # Provides: haspd
@@ -14,25 +15,32 @@
 # Default-Start: 2 3 4 5
 # Default-Stop: 0 1 6
 # Short-Description: Hasp keys support
-# Description: starts aksusbd and hasplmd services
+# Description: loads the aksparlnx driver and starts aksusbd, winehasp ans hasplm processes
 ### END INIT INFO
 
-HASPLM_ARGS="-c /etc/haspd/hasplm.conf"
+RMMOD=/sbin/rmmod
+MODPROBE=/sbin/modprobe
+INSMOD=/sbin/insmod
+
+export MODULENAME=aksparlnx
 # this version will filled from spec version during build
-export MODULEVERSION=8.53-eter1ubuntu
-
-# copied from /etc/init.d/functions
-SourceIfNotEmpty()
-{
-	local f
-	f="$1"
-	shift
-	[ -s "$f" ] && . "$f" "$@"
-}
-
-
+export MODULEVERSION=FILLED
+HASPLM_ARGS="-c /etc/haspd/hasplm.conf"
 HASPLMD_ARGS="-s"
-SourceIfNotEmpty /etc/sysconfig/haspd
+
+EXTMO=ko
+[ "$(uname -r | cut -c1-3)" = "2.4" ] && EXTMO=o
+
+# sudo without sbin in path support
+export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
+
+# current module or manually built
+[ -n "$KERNELVERSION" ] || KERNELVERSION=$(uname -r)
+test -n "$DEFMODULEPATH" || DEFMODULEPATH=/lib/modules/$KERNELVERSION/kernel/extra/$MODULENAME.$EXTMO
+#MANMODULEPATH=/lib/modules/haspd/$MODULENAME.$EXTMO
+# use manually build if exists
+#[ -r "$MANMODULEPATH" ] && DEFMODULEPATH=$MANMODULEPATH
+
 
 OUTFORMAT=/etc/init.d/outformat
 [ -x $OUTFORMAT ] || OUTFORMAT=/etc/init.d/haspd.outformat
@@ -106,6 +114,68 @@ is_loaded()
     test -n "$dpid"
 }
 
+is_moduled()
+{
+    lsmod | grep $MODULENAME > /dev/null
+}
+
+# Get kernel version
+get_vermagic()
+{
+    MODFILE=$1
+    modinfo $MODFILE | grep vermagic | sed -e "s| \+| |g" | cut -d " " -f 3-
+}
+
+load_module()
+{
+    local i
+    echo -n "Loading HASP LPT kernel module... "
+    $MODPROBE lp
+    if [ ! -e /dev/lp0 ] ; then
+        echo -n " (/dev/lp0 device has not found) "
+        passed
+        return
+    fi
+
+    # FIXME: how we can detect missed port?
+    #if ! cat /dev/lp0 2>/dev/null >/dev/null ; then
+    #    echo -n " (LPT port has not found) "
+    #    passed
+    #    return
+    #fi
+
+    # What about two key?
+    if [ ! -c /dev/Hardlock ]; then
+        mknod /dev/Hardlock c 42 0
+        chmod 660 /dev/Hardlock
+    fi
+
+    $MODPROBE parport_pc
+
+    # try load module by modprobe
+    $MODPROBE $MODULENAME 2>/dev/null && { echo ; echo -n "    modprobe $MODULENAME" ; success ; return ; }
+
+    #if [ -r "$DEFMODULEPATH" ] ; then
+    #        local INSMODF=
+    #        [ "$EXTMO" = "o" ] && INSMODF="-f"
+    #    $INSMOD $INSMODF $DEFMODULEPATH && { echo -n -e "\n\tinsmod $DEFMODULEPATH" ; success ; return ; }
+    #	    #echo -n "Incorrect module. Your system: " ; uname -a ; dmesg | tail -n2
+    #fi
+    #echo -n -e "$DEFMODULEPATH is not found,\nyou can try compile it with 'service haspd build' command."
+    if [ -r "$DEFMODULEPATH" ] ; then
+        #echo "$MODULENAME is not loaded with errors..."
+        #$MODPROBE $MODULENAME
+        echo -n " (LPT port has not found) "
+        passed
+        return
+    else
+        echo "$MODULENAME is not found"
+        echo -n "you can try compile it with 'service haspd build' command."
+        failure
+    fi
+    echo "Note: This kernel module needed ONLY for LPT HASP keys"
+    echo
+}
 
 check_debugfs()
 {
@@ -113,6 +183,32 @@ check_debugfs()
     echo -n "Mount debugfs to /sys/kernel/debug"
     mount -t debugfs debugfs /sys/kernel/debug || { failure ; return ; }
     test -r "$1" && success || { echo "$1 still missed" ; failure ; }
+}
+
+check_usbfs()
+{
+    if [ ! -f /proc/bus/usb/devices ]; then
+        echo -n "Check kernel for CONFIG_USB_DEVICEFS... "
+	if [ ! -d /proc/bus/usb ] ; then
+	        #failure
+		#echo "You have to use kernel with CONFIG_USB_DEVICEFS enabled for support USB HASP"
+		passed
+		echo -n "Enable workaround for /proc/bus/usb (bind from /dev/bus/usb)"
+		mount --bind /dev/bus /proc/bus && success || failure
+		check_debugfs /sys/kernel/debug/usb/devices
+		ln -s /sys/kernel/debug/usb/devices /proc/bus/usb/devices && success
+		# return 1
+	else
+		success
+	        echo -n "Mounting usbdevfs to /proc/bus/usb (it can be insecure)... "
+	        #echo "You have to mount usbfs (usbdevfs) filesystem into /proc/bus/usb, f.i.: mount -t usbfs none /proc/bus/usb"
+		mount -t usbfs none /proc/bus/usb || failure
+		success
+	fi
+    fi
+    # for libusb: use modern way instead /proc/bus/usb
+    test -d /dev/bus/usb && export USB_DEVFS_PATH=/dev/bus/usb
+    return 0
 }
 
 start_inservice()
@@ -129,9 +225,25 @@ start_inservice()
 	fi
 }
 
+start_sentinel()
+{
+	# Load Sentinel
+	cd /usr/lib/sentinel 2>/dev/null || return
+	export LD_LIBRARY_PATH=./
+	export PATH=./:$PATH
+	start_inservice usbsentinel
+	start_inservice SntlKeysSrvrlnx
+	cd - >/dev/null
+}
+
 start()
 {
+	load_module
+	check_usbfs
+
+	# start HASP always due possible LPT keys (undetected as USB)
 	start_inservice aksusbd
+	#start_inservice winehasp
 	start_inservice hasplm $HASPLM_ARGS
 	start_inservice hasplmd $HASPLMD_ARGS
 
@@ -148,6 +260,12 @@ start()
 		case $i in
 			aladdin)
 #				echo "HASP key present"
+				;;
+			eutron)
+				start_inservice skeyd
+				;;
+			sentinel)
+				start_sentinel
 				;;
 			*)
 				echo "Unknown key $i"
@@ -182,25 +300,51 @@ stopping()
 
 stop()
 {
-    for i in hasplmd hasplm aksusbd ; do
+    for i in hasplmd hasplm winehasp aksusbd ; do
         echo -n "Stopping $i... "
 	stopping $i
     done
 
+    for i in skeyd usbsentinel SntlKeysSrvrlnx; do
+        echo -n "Stopping $i... "
+	stopping $i
+    done
+
+	if [ -L "/proc/bus/usb/devices" ] ; then
+		echo -n "Stopping workaround for /proc/bus/usb"
+		rm -f /proc/bus/usb/devices
+		umount /proc/bus
+		success
+	fi
+
+    echo -n "Unloading HASP LPT kernel module... "
+    is_moduled || { passed ; return ; }
+    $RMMOD aksparlnx || { failure ; return ; }
     success
 
 }
 
 status()
 {
-	echo "Hardware protection keys support bundle. Etersoft (c) 2008-2016, 2021"
-	echo "HASPD package $MODULEVERSION"
+	echo "Hardware protection keys support bundle. Etersoft (c) 2008-2016"
+	echo "HASPD package $MODULEVERSION with /dev/bus/usb support"
+	echo "Aladdin HASP 4/HL/SRM driver status:"
+	is_moduled && echo "    kernel module aksparlnx is loaded" || echo "    kernel module aksparlnx is not loaded (WARNING: HASP LPT keys support is disabled! Run service haspd build if needed.)"
 	
-	for i in aksusbd hasplm hasplmd; do
+	for i in aksusbd winehasp hasplm hasplmd; do
 		is_loaded $i && echo "    $i is running" || echo "    $i is stopped"
 	done
 	is_loaded aksusbd && aksusbd -v
-
+	[ -L "/proc/bus/usb/devices" ] && echo "    /proc/bus/usb workaround is enabled"
+	echo "Smartkey 3 USB/LPT driver status:"
+	for i in skeyd ; do
+		is_loaded $i && echo "    $i is running" || echo "    $i is stopped"
+	done
+	is_loaded skeyd && skeymon
+	echo "SafeNet Sentinel status:"
+	for i in usbsentinel SntlKeysSrvrlnx ; do
+		is_loaded $i && echo "    $i is running" || echo "    $i is stopped"
+	done
 	echo
 	echo
 	echo "Use \$ eterkeytest [--hasp] [--sentinel] [--eutron] (WINE@Etersoft only)"
@@ -223,15 +367,24 @@ case "$1" in
     restart)
         restart
         ;;
+    build)
+        # remove manual built module
+        #rm -f $DEFMODULEPATH
+        #cd /usr/src/$MODULENAME-$MODULEVERSION || exit
+        #MODDEST=`dirname $DEFMODULEPATH` sh ./build.sh -i -v
+        #depmod -a
+        ;;
     status)
         status
         ;;
     condrestart)
+        # remove manual built module
+        rm -f $MANMODULEPATH
         # only restart if it is already running
         # TODO: more correctly
         is_loaded aksusbd && restart
         ;;
     *)
-        echo "Usage: haspd {start|stop|restart|condrestart|condstop|status}"
+        echo "Usage: haspd {start|stop|restart|build|condrestart|condstop|status}"
 esac
 
