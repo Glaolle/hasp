@@ -1,4 +1,4 @@
 #!/bin/bash
 
-	/etc/init.d/haspd condstop || : 
-	test -x /usr/sbin/update-rc.d && update-rc.d -f haspd remove || :
+systemctl stop aksusbd hasplm
+systemctl disable aksusbd hasplm

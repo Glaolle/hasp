@@ -1,0 +1,12 @@
+[Unit]
+Description=Sentinel LDK Runtime Environment (hasplm daemon)
+Requires=aksusbd.service
+After=network.target aksusbd.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/hasplm -c /etc/haspd/hasplm.conf
+
+[Install]
+WantedBy=multi-user.target
