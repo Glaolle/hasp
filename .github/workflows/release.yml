@@ -30,6 +30,8 @@ jobs:
 
       - name: Build DEB Package
         run: |
+          sudo apt update -y
+          sudo apt dist-upgrade -y
           sudo apt install devscripts build-essential lintian dkms debhelper libjansson-dev linux-headers-generic -y
           cd REPO
           export DEBFULLNAME="Glaolle"
