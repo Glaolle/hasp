@@ -6,13 +6,9 @@ Before=hasplm.service
 Type=oneshot
 RemainAfterExit=yes
 ExecStartPre=bash -c 'if [ ! -c /dev/Hardlock ]; then mknod /dev/Hardlock c 42 0; chmod 660 /dev/Hardlock; fi'
-ExecStartPre=/sbin/modprobe lp
-ExecStartPre=/sbin/modprobe parport_pc
 ExecStartPre=/sbin/modprobe aksparlnx
 ExecStart=/usr/sbin/aksusbd
 ExecStopPost=/sbin/modprobe -r aksparlnx
-ExecStopPost=/sbin/modprobe -r parport_pc
-ExecStopPost=/sbin/modprobe -r lp
 
 [Install]
 WantedBy=multi-user.target
