@@ -57,11 +57,11 @@ jobs:
           cd ./usbhaspd
           debuild -us -uc -tc -b
           cd ..
-
-	  cd ./usbhaspinfo
-	  debuild -us -uc -tc -b
-	  cd ..
-
+          
+          cd ./usbhaspd
+          debuild -us -uc -tc -b
+          cd ..
+  
           rm -f *.build* *.changes
           unset DEBEMAIL
           unset DEBFULLNAME
