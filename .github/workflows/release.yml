@@ -47,7 +47,7 @@ jobs:
           debuild -us -uc -tc -b
           cd ..
           
-          #sudo dpkg --unpack ./usb-vhci*.deb
+          sudo dpkg --unpack ./usb-vhci*.deb
           cd ./libusb-vhci
           debuild -us -uc -tc -b
           cd ..
