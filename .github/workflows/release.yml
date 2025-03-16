@@ -47,15 +47,21 @@ jobs:
           debuild -us -uc -tc -b
           cd ..
           
-          sudo dpkg --unpack ./usb-vhci*.deb
+          #sudo dpkg --unpack ./usb-vhci*.deb
           cd ./libusb-vhci
           debuild -us -uc -tc -b
           cd ..
 
           sudo dpkg -i ./libusb-vhci*.deb
+
           cd ./usbhaspd
           debuild -us -uc -tc -b
           cd ..
+
+	  cd ./usbhaspinfo
+	  debuild -us -uc -tc -b
+	  cd ..
+
           rm -f *.build* *.changes
           unset DEBEMAIL
           unset DEBFULLNAME
