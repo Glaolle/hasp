@@ -8,7 +8,7 @@ virtual_device2_DEPENDENCIES = ../src/libusb_vhci.la
 
 
 # set the include path found by configure
-INCLUDES = $(all_includes)
+#INCLUDES = $(all_includes)
 
 # the library search path.
 virtual_device_LDFLAGS = $(all_libraries)

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+case $1 in
+  upgrade) rmmod usb_vhci_hcd
+	   rmmod usb_vhci_iocifc
+	   systemctl stop usbhaspd
+           systemctl disable usbhaspd
+           ;;
+esac
+
+exit 0

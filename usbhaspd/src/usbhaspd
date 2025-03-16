@@ -1,0 +1,25 @@
+#!/bin/bash
+
+NAME=usbhaspd
+
+DAEMON_BIN=/usr/bin/usbhasp
+KEY_DIR=/etc/${NAME}/keys
+DAEMON_CONF=/etc/${NAME}/${NAME}.conf
+
+# read optional conf
+if test -f ${DAEMON_CONF} ; then . ${DAEMON_CONF}; fi
+
+# Read key list
+keys=""
+if test -d ${KEY_DIR}; then keys="${KEY_DIR}/*.json"; fi
+
+DAEMON_ARGS="$keys"
+
+# Start kernel modules
+modprobe usb_vhci_hcd
+modprobe usb_vhci_iocifc
+
+# Start daemon
+${DAEMON_BIN} ${DAEMON_ARGS}
+
+exit 0

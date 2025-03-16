@@ -3,3 +3,4 @@
 rm -f /etc/systemd/system/aksusbd.service
 rm -f /etc/systemd/system/hasplm.service
 
+exit 0

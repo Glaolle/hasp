@@ -2,3 +2,5 @@
 
 systemctl enable aksusbd hasplm
 systemctl restart aksusbd hasplm
+
+exit 0

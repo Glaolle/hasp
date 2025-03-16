@@ -8,7 +8,7 @@ hcd.cpp \
 local_hcd.cpp
 
 # set the include path found by configure
-INCLUDES = $(all_includes)
+#INCLUDES = $(all_includes)
 
 # the library search path.
 libusb_vhci_la_LDFLAGS = $(all_libraries) -lpthread

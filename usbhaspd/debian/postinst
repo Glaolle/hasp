@@ -1,0 +1,8 @@
+#!/bin/sh
+
+modprobe usb_vhci_hcd
+modprobe usb_vhci_iocifc
+systemctl enable usbhaspd
+systemctl restart usbhaspd
+
+exit 0

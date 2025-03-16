@@ -8,6 +8,7 @@ Section: Unspecified
 Architecture: any
 Multi-Arch: same
 #Pre-Depends: ${misc:Pre-Depends}
-Depends: ${misc:Depends}, libusb-vhci, jansson
+#Depends: ${misc:Depends}, libusb-vhci, libjansson
+Depends: ${misc:Depends}, libusb-vhci, libjansson4
 Description: This project is about Usb hasp emulator on Linux.
  In particular on Debian based platforms.

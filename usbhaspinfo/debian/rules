@@ -9,6 +9,7 @@ include /usr/share/dpkg/pkg-info.mk
 override_dh_install:
 	cd $(CURDIR)/src && make
 	dh_install src/usbhaspinfo /usr/sbin/
+	dh_install src/nethasp.ini /etc/hasplm/
 
 override_dh_auto_clean:
 	cd $(CURDIR)/src && make clean

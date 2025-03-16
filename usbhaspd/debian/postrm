@@ -1,0 +1,7 @@
+#!/bin/sh
+
+rmmod usb_vhci_hcd
+rmmod usb_vhci_iocifc
+rm -f /etc/systemd/system/usbhaspd.service
+
+exit 0

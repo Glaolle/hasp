@@ -30,12 +30,14 @@ else
 fi
 
 # Checks for programs.
-AC_LANG_C
+#AC_LANG_C
+AC_LANG([C])
 AC_PROG_CC
-AC_PROG_CC_STDC
+#AC_PROG_CC_STDC
 AM_PROG_CC_C_O
 AC_PROG_CXX
-AC_PROG_LIBTOOL
+#AC_PROG_LIBTOOL
+LT_INIT
 AC_PROG_INSTALL
 
 # Checks for libraries.
