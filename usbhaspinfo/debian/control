@@ -1,0 +1,14 @@
+Source: usbhaspinfo
+Maintainer: Glaolle <glaolle@gmail.com>
+Priority: optional
+Section: Unspecified
+
+Package: usbhaspinfo
+Section: Unspecified
+Architecture: any
+Multi-Arch: same
+#Pre-Depends: ${misc:Pre-Depends}
+#Depends: ${misc:Depends}
+Depends: usbhaspd
+Description: Supplimental tool for UsbHasp discovered in Internet.
+ In particular on Debian based platforms.

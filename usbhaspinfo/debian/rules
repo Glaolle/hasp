@@ -1,0 +1,14 @@
+#!/usr/bin/make -f
+
+#export DH_VERBOSE=1
+include /usr/share/dpkg/pkg-info.mk
+
+%:
+	dh $@
+
+override_dh_install:
+	cd $(CURDIR)/src && make
+	dh_install src/usbhaspinfo /usr/sbin/
+
+override_dh_auto_clean:
+	cd $(CURDIR)/src && make clean
