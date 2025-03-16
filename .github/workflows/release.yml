@@ -58,7 +58,7 @@ jobs:
           debuild -us -uc -tc -b
           cd ..
           
-          cd ./usbhaspd
+          cd ./usbhaspinfo
           debuild -us -uc -tc -b
           cd ..
   
