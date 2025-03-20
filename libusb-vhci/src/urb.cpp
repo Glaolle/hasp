@@ -38,7 +38,7 @@
 
 namespace usb
 {
-	void urb::_cpy(const usb_vhci_urb& u) throw(std::bad_alloc)
+	void urb::_cpy(const usb_vhci_urb& u) noexcept(false)
 	{
 		if(_urb.buffer_length)
 		{
@@ -52,7 +52,7 @@ namespace usb
 		}
 	}
 
-	void urb::_chk() throw(std::invalid_argument)
+	void urb::_chk() noexcept(false)
 	{
 		switch(_urb.type)
 		{
@@ -70,7 +70,7 @@ namespace usb
 		}
 	}
 
-	urb::urb(const urb& urb) throw(std::bad_alloc) : _urb(urb._urb)
+	urb::urb(const urb& urb) noexcept(false) : _urb(urb._urb)
 	{
 		_urb.buffer = NULL;
 		_urb.iso_packets = NULL;
@@ -96,7 +96,7 @@ namespace usb
 	         uint8_t bRequest,
 	         uint16_t wValue,
 	         uint16_t wIndex,
-	         uint16_t wLength) throw(std::invalid_argument, std::bad_alloc) : _urb()
+	         uint16_t wLength) noexcept(false) : _urb()
 	{
 		_urb.handle = handle;
 		_urb.buffer_length = buffer_length;
@@ -186,7 +186,7 @@ namespace usb
 		}
 	}
 
-	urb::urb(const usb_vhci_urb& urb) throw(std::invalid_argument, std::bad_alloc) : _urb(urb)
+	urb::urb(const usb_vhci_urb& urb) noexcept(false) : _urb(urb)
 	{
 		_urb.buffer = NULL;
 		_urb.iso_packets = NULL;
@@ -194,7 +194,7 @@ namespace usb
 		_cpy(urb);
 	}
 
-	urb::urb(const usb_vhci_urb& urb, bool own) throw(std::invalid_argument, std::bad_alloc) : _urb(urb)
+	urb::urb(const usb_vhci_urb& urb, bool own) noexcept(false) : _urb(urb)
 	{
 		if(!own)
 		{
@@ -221,7 +221,7 @@ namespace usb
 			delete[] _urb.iso_packets;
 	}
 
-	urb& urb::operator=(const urb& urb) throw(std::bad_alloc)
+	urb& urb::operator=(const urb& urb) noexcept(false)
 	{
 		if(_urb.buffer)
 			delete[] _urb.buffer;
@@ -234,7 +234,7 @@ namespace usb
 		return *this;
 	}
 
-	void urb::set_iso_results() throw(std::logic_error)
+	void urb::set_iso_results() noexcept(false)
 	{
 		if(!is_isochronous())
 			throw std::logic_error("not an isochronous urb");

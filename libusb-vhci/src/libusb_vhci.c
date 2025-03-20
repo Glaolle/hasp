@@ -373,7 +373,7 @@ int usb_vhci_to_errno(int32_t status, uint8_t iso_urb)
 
 int32_t usb_vhci_from_errno(int errnumber, uint8_t iso_urb)
 {
-	switch(errnumber)
+	switch(errno)
 	{
 	case 0:            return USB_VHCI_STATUS_SUCCESS;
 	case -EINPROGRESS: return USB_VHCI_STATUS_PENDING;

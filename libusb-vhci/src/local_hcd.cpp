@@ -41,7 +41,7 @@ namespace usb
 {
 	namespace vhci
 	{
-		local_hcd::local_hcd(uint8_t ports) throw(std::exception) :
+		local_hcd::local_hcd(uint8_t ports) noexcept(false) :
 			hcd(ports),
 			fd(-1),
 			id(),
@@ -70,7 +70,7 @@ namespace usb
 		}
 
 		// caller has _lock
-		uint8_t local_hcd::address_from_port(uint8_t port) const throw(std::invalid_argument, std::out_of_range)
+		uint8_t local_hcd::address_from_port(uint8_t port) const noexcept(false)
 		{
 			if(!port) throw std::invalid_argument("port");
 			if(port > get_port_count()) throw std::out_of_range("port");
@@ -78,7 +78,7 @@ namespace usb
 		}
 
 		// caller has _lock
-		uint8_t local_hcd::port_from_address(uint8_t address) const throw(std::invalid_argument)
+		uint8_t local_hcd::port_from_address(uint8_t address) const noexcept(false)
 		{
 			if(address > 0x7f) throw std::invalid_argument("address");
 			for(uint8_t i(0); i < get_port_count(); i++)
@@ -139,7 +139,7 @@ namespace usb
 					}
 					_this.enqueue_work(psw);
 				}
-				catch(std::bad_alloc)
+				catch(std::bad_alloc const&)
 				{
 					// jump outside the lock and wait for others to free mem
 					goto retry_ps;
@@ -268,7 +268,7 @@ namespace usb
 				{
 					_this.enqueue_work(puw);
 				}
-				catch(std::bad_alloc)
+				catch(std::bad_alloc const&)
 				{
 					// rollback changes on 'this'
 					_this.port_info[index - 1].adr = rollback_address;
@@ -285,7 +285,7 @@ namespace usb
 		}
 
 		// caller has _lock
-		void local_hcd::canceling_work(work* w, bool in_progress) throw(std::exception)
+		void local_hcd::canceling_work(work* w, bool in_progress) noexcept(false)
 		{
 			process_urb_work* uw;
 			if(in_progress && (uw = dynamic_cast<process_urb_work*>(w)))
@@ -302,7 +302,7 @@ namespace usb
 		}
 
 		// caller has _lock
-		void local_hcd::finishing_work(work* w) throw(std::exception)
+		void local_hcd::finishing_work(work* w) noexcept(false)
 		{
 			process_urb_work* uw(dynamic_cast<process_urb_work*>(w));
 			if(uw)
@@ -315,7 +315,7 @@ namespace usb
 			}
 		}
 
-		const port_stat& local_hcd::get_port_stat(uint8_t port) volatile throw(std::invalid_argument, std::out_of_range)
+		const port_stat& local_hcd::get_port_stat(uint8_t port) volatile noexcept(false)
 		{
 			if(!port) throw std::invalid_argument("port");
 			if(port > get_port_count()) throw std::out_of_range("port");
@@ -323,7 +323,7 @@ namespace usb
 			return port_info[port - 1].stat;
 		}
 
-		void local_hcd::port_connect(uint8_t port, usb::data_rate rate) volatile throw(std::exception)
+		void local_hcd::port_connect(uint8_t port, usb::data_rate rate) volatile noexcept(false)
 		{
 			if(!port) throw std::invalid_argument("port");
 			if(port > get_port_count()) throw std::out_of_range("port");
@@ -331,7 +331,7 @@ namespace usb
 				throw std::exception();
 		}
 
-		void local_hcd::port_disconnect(uint8_t port) volatile throw(std::exception)
+		void local_hcd::port_disconnect(uint8_t port) volatile noexcept(false)
 		{
 			if(!port) throw std::invalid_argument("port");
 			if(port > get_port_count()) throw std::out_of_range("port");
@@ -339,7 +339,7 @@ namespace usb
 				throw std::exception();
 		}
 
-		void local_hcd::port_disable(uint8_t port) volatile throw(std::exception)
+		void local_hcd::port_disable(uint8_t port) volatile noexcept(false)
 		{
 			if(!port) throw std::invalid_argument("port");
 			if(port > get_port_count()) throw std::out_of_range("port");
@@ -347,7 +347,7 @@ namespace usb
 				throw std::exception();
 		}
 
-		void local_hcd::port_resumed(uint8_t port) volatile throw(std::exception)
+		void local_hcd::port_resumed(uint8_t port) volatile noexcept(false)
 		{
 			if(!port) throw std::invalid_argument("port");
 			if(port > get_port_count()) throw std::out_of_range("port");
@@ -355,7 +355,7 @@ namespace usb
 				throw std::exception();
 		}
 
-		void local_hcd::port_overcurrent(uint8_t port, bool set) volatile throw(std::exception)
+		void local_hcd::port_overcurrent(uint8_t port, bool set) volatile noexcept(false)
 		{
 			if(!port) throw std::invalid_argument("port");
 			if(port > get_port_count()) throw std::out_of_range("port");
@@ -363,7 +363,7 @@ namespace usb
 				throw std::exception();
 		}
 
-		void local_hcd::port_reset_done(uint8_t port, bool enable) volatile throw(std::exception)
+		void local_hcd::port_reset_done(uint8_t port, bool enable) volatile noexcept(false)
 		{
 			if(!port) throw std::invalid_argument("port");
 			if(port > get_port_count()) throw std::out_of_range("port");

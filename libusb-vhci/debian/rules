@@ -1,7 +1,6 @@
 #!/usr/bin/make -f
 
-#export DEB_CXXFLAGS_MAINT_APPEND = -std=c++03
-export DEB_CXXFLAGS_MAINT_APPEND = -std=c++11
+#export DEB_CXXFLAGS_MAINT_APPEND = -std=c++11
 include /usr/share/dpkg/pkg-info.mk
 
 DEB_CONFIGURE_EXTRA_FLAGS = --libdir="\$${prefix}/lib/$(DEB_HOST_MULTIARCH)"

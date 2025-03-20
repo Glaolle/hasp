@@ -38,7 +38,7 @@ namespace usb
 {
 	namespace vhci
 	{
-		hcd::hcd(uint8_t ports) throw(std::invalid_argument, std::bad_alloc) :
+		hcd::hcd(uint8_t ports) noexcept(false) :
 			work_enqueued_callbacks(),
 			bg_thread(),
 			thread_shutdown(false),
@@ -76,12 +76,12 @@ namespace usb
 		}
 
 		// caller has _lock
-		void hcd::enqueue_work(work* w) throw(std::bad_alloc)
+		void hcd::enqueue_work(work* w) noexcept(false)
 		{
 			inbox.push_back(w);
 		}
 
-		void hcd::init_bg_thread() volatile throw(std::exception)
+		void hcd::init_bg_thread() volatile noexcept(false)
 		{
 			pthread_attr_t attr;
 			pthread_attr_init(&attr);
@@ -120,7 +120,7 @@ namespace usb
 			return NULL;
 		}
 
-		bool hcd::next_work(work** w) volatile throw(std::bad_alloc)
+		bool hcd::next_work(work** w) volatile noexcept(false)
 		{
 			*w = NULL;
 			lock _(_lock);
@@ -142,7 +142,7 @@ namespace usb
 			return false;
 		}
 
-		void hcd::finish_work(work* w) volatile throw(std::exception)
+		void hcd::finish_work(work* w) volatile noexcept(false)
 		{
 			{
 				lock _(_lock);
@@ -153,7 +153,7 @@ namespace usb
 			delete w;
 		}
 
-		bool hcd::cancel_process_urb_work(uint64_t handle) volatile throw(std::exception)
+		bool hcd::cancel_process_urb_work(uint64_t handle) volatile noexcept(false)
 		{
 			lock _(_lock);
 			hcd& _this(const_cast<hcd&>(*this));
@@ -200,11 +200,11 @@ namespace usb
 		}
 
 		// caller has _lock
-		void hcd::canceling_work(work* w, bool in_progress) throw(std::exception) { }
+		void hcd::canceling_work(work* w, bool in_progress) noexcept(false) { }
 		// caller has _lock
-		void hcd::finishing_work(work* w) throw(std::exception) { }
+		void hcd::finishing_work(work* w) noexcept(false) { }
 
-		void hcd::add_work_enqueued_callback(callback c) volatile throw(std::bad_alloc)
+		void hcd::add_work_enqueued_callback(callback c) volatile noexcept(false)
 		{
 			lock _(_lock);
 			hcd& _this(const_cast<hcd&>(*this));

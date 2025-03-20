@@ -210,11 +210,11 @@ namespace usb
 	private:
 		usb_vhci_urb _urb;
 
-		void _cpy(const usb_vhci_urb& u) throw(std::bad_alloc);
-		void _chk() throw(std::invalid_argument);
+		void _cpy(const usb_vhci_urb& u) noexcept(false);
+		void _chk() noexcept(false);
 
 	public:
-		urb(const urb&) throw(std::bad_alloc);
+		urb(const urb&) noexcept(false);
 		urb(uint64_t handle,
 		    urb_type type,
 		    int32_t buffer_length,
@@ -234,11 +234,11 @@ namespace usb
 		    uint8_t bRequest,
 		    uint16_t wValue,
 		    uint16_t wIndex,
-		    uint16_t wLength) throw(std::invalid_argument, std::bad_alloc);
-		urb(const usb_vhci_urb& urb) throw(std::invalid_argument, std::bad_alloc);
-		urb(const usb_vhci_urb& urb, bool own) throw(std::invalid_argument, std::bad_alloc);
+		    uint16_t wLength) noexcept(false);
+		urb(const usb_vhci_urb& urb) noexcept(false);
+		urb(const usb_vhci_urb& urb, bool own) noexcept(false);
 		virtual ~urb() throw();
-		urb& operator=(const urb&) throw(std::bad_alloc);
+		urb& operator=(const urb&) noexcept(false);
 
 		const usb_vhci_urb* get_internal() const throw() { return &_urb; }
 		uint64_t get_handle() const throw() { return _urb.handle; }
@@ -281,7 +281,7 @@ namespace usb
 		void set_iso_packet_actual(int32_t index, int32_t value) throw() { _urb.iso_packets[index].packet_actual = value; }
 		bool is_short_not_ok() const throw() { return _urb.flags & USB_VHCI_URB_FLAGS_SHORT_NOT_OK; }
 		bool is_zero_packet() const throw() { return _urb.flags & USB_VHCI_URB_FLAGS_ZERO_PACKET; }
-		void set_iso_results() throw(std::logic_error);
+		void set_iso_results() noexcept(false);
 	};
 
 	namespace vhci
@@ -377,7 +377,7 @@ namespace usb
 			bool canceled;
 
 		protected:
-			work(uint8_t port) throw(std::invalid_argument);
+			work(uint8_t port) noexcept(false);
 
 		public:
 			virtual ~work() throw();
@@ -392,9 +392,9 @@ namespace usb
 			usb::urb* urb;
 
 		public:
-			process_urb_work(uint8_t port, usb::urb* urb) throw(std::invalid_argument);
-			process_urb_work(const process_urb_work&) throw(std::bad_alloc);
-			process_urb_work& operator=(const process_urb_work&) throw(std::bad_alloc);
+			process_urb_work(uint8_t port, usb::urb* urb) noexcept(false);
+			process_urb_work(const process_urb_work&) noexcept(false);
+			process_urb_work& operator=(const process_urb_work&) noexcept(false);
 			virtual ~process_urb_work() throw();
 			usb::urb* get_urb() const throw() { return urb; }
 		};
@@ -405,7 +405,7 @@ namespace usb
 			uint64_t handle;
 
 		public:
-			cancel_urb_work(uint8_t port, uint64_t handle) throw(std::invalid_argument);
+			cancel_urb_work(uint8_t port, uint64_t handle) noexcept(false);
 			uint64_t get_handle() const throw() { return handle; }
 		};
 
@@ -416,8 +416,8 @@ namespace usb
 			uint8_t trigger_flags;
 
 		public:
-			port_stat_work(uint8_t port, const port_stat& stat) throw(std::invalid_argument);
-			port_stat_work(uint8_t port, const port_stat& stat, const port_stat& prev) throw(std::invalid_argument);
+			port_stat_work(uint8_t port, const port_stat& stat) noexcept(false);
+			port_stat_work(uint8_t port, const port_stat& stat, const port_stat& prev) noexcept(false);
 			const port_stat& get_port_stat() const throw() { return stat; }
 			uint8_t get_trigger_flags()     const throw() { return trigger_flags; }
 			bool triggers_disable()  const throw() { return trigger_flags & USB_VHCI_PORT_STAT_TRIGGER_DISABLE; }
@@ -438,7 +438,7 @@ namespace usb
 				void* arg;
 
 			public:
-				callback(void (*func)(void*, hcd&) throw(), void* arg) throw(std::invalid_argument) : func(func), arg(arg)
+				callback(void (*func)(void*, hcd&) throw(), void* arg) noexcept(false) : func(func), arg(arg)
 				{
 					if(!func) throw std::invalid_argument("func");
 				}
@@ -472,15 +472,15 @@ namespace usb
 			static void* bg_thread_start(void* _this) throw();
 
 		protected:
-			explicit hcd(uint8_t ports) throw(std::invalid_argument, std::bad_alloc);
+			explicit hcd(uint8_t ports) noexcept(false);
 			virtual void bg_work() volatile throw() = 0;
-			virtual uint8_t address_from_port(uint8_t port) const throw(std::exception) = 0;
-			virtual uint8_t port_from_address(uint8_t address) const throw(std::exception) = 0;
-			virtual void canceling_work(work* w, bool in_progress) throw(std::exception);
-			virtual void finishing_work(work* w) throw(std::exception);
+			virtual uint8_t address_from_port(uint8_t port) const noexcept(false) = 0;
+			virtual uint8_t port_from_address(uint8_t address) const noexcept(false) = 0;
+			virtual void canceling_work(work* w, bool in_progress) noexcept(false);
+			virtual void finishing_work(work* w) noexcept(false);
 			virtual void on_work_enqueued() throw();
-			void enqueue_work(work* w) throw(std::bad_alloc);
-			void init_bg_thread() volatile throw(std::exception);
+			void enqueue_work(work* w) noexcept(false);
+			void init_bg_thread() volatile noexcept(false);
 			void join_bg_thread() volatile throw();
 			pthread_mutex_t& get_lock() volatile throw() { return const_cast<pthread_mutex_t&>(_lock); }
 			bool is_thread_shutdown() const volatile throw() { return thread_shutdown; }
@@ -488,19 +488,19 @@ namespace usb
 		public:
 			virtual ~hcd() throw();
 
-			void add_work_enqueued_callback(callback c) volatile throw(std::bad_alloc);
+			void add_work_enqueued_callback(callback c) volatile noexcept(false);
 			void remove_work_enqueued_callback(callback c) volatile throw();
-			virtual const port_stat& get_port_stat(uint8_t port) volatile throw(std::exception) = 0;
-			virtual void port_connect(uint8_t port, usb::data_rate rate) volatile throw(std::exception) = 0;
-			virtual void port_disconnect(uint8_t port) volatile throw(std::exception) = 0;
-			virtual void port_disable(uint8_t port) volatile throw(std::exception) = 0;
-			virtual void port_resumed(uint8_t port) volatile throw(std::exception) = 0;
-			virtual void port_overcurrent(uint8_t port, bool set) volatile throw(std::exception) = 0;
-			virtual void port_reset_done(uint8_t port, bool enable = true) volatile throw(std::exception) = 0;
+			virtual const port_stat& get_port_stat(uint8_t port) volatile noexcept(false) = 0;
+			virtual void port_connect(uint8_t port, usb::data_rate rate) volatile noexcept(false) = 0;
+			virtual void port_disconnect(uint8_t port) volatile noexcept(false) = 0;
+			virtual void port_disable(uint8_t port) volatile noexcept(false) = 0;
+			virtual void port_resumed(uint8_t port) volatile noexcept(false) = 0;
+			virtual void port_overcurrent(uint8_t port, bool set) volatile noexcept(false) = 0;
+			virtual void port_reset_done(uint8_t port, bool enable = true) volatile noexcept(false) = 0;
 			uint8_t get_port_count() const volatile throw() { return port_count; }
-			bool next_work(work** w) volatile throw(std::bad_alloc);
-			void finish_work(work* w) volatile throw(std::exception);
-			bool cancel_process_urb_work(uint64_t handle) volatile throw(std::exception);
+			bool next_work(work** w) volatile noexcept(false);
+			void finish_work(work* w) volatile noexcept(false);
+			bool cancel_process_urb_work(uint64_t handle) volatile noexcept(false);
 		};
 
 		class local_hcd : public hcd
@@ -523,26 +523,26 @@ namespace usb
 			local_hcd& operator=(const local_hcd&) throw();
 
 		protected:
-			virtual uint8_t address_from_port(uint8_t port) const throw(std::invalid_argument, std::out_of_range);
-			virtual uint8_t port_from_address(uint8_t address) const throw(std::invalid_argument);
-			virtual void canceling_work(work* w, bool in_progress) throw(std::exception);
-			virtual void finishing_work(work* w) throw(std::exception);
+			virtual uint8_t address_from_port(uint8_t port) const noexcept(false);
+			virtual uint8_t port_from_address(uint8_t address) const noexcept(false);
+			virtual void canceling_work(work* w, bool in_progress) noexcept(false);
+			virtual void finishing_work(work* w) noexcept(false);
 
 		public:
-			explicit local_hcd(uint8_t ports) throw(std::exception);
+			explicit local_hcd(uint8_t ports) noexcept(false);
 			virtual ~local_hcd() throw();
 
 			int32_t get_vhci_id() volatile throw() { return id; }
 			const std::string& get_bus_id() volatile throw() { return const_cast<const std::string&>(bus_id); }
 			int32_t get_usb_bus_num() volatile throw() { return usb_bus_num; }
 			virtual void bg_work() volatile throw();
-			virtual const port_stat& get_port_stat(uint8_t port) volatile throw(std::invalid_argument, std::out_of_range);
-			virtual void port_connect(uint8_t port, usb::data_rate rate) volatile throw(std::exception);
-			virtual void port_disconnect(uint8_t port) volatile throw(std::exception);
-			virtual void port_disable(uint8_t port) volatile throw(std::exception);
-			virtual void port_resumed(uint8_t port) volatile throw(std::exception);
-			virtual void port_overcurrent(uint8_t port, bool set) volatile throw(std::exception);
-			virtual void port_reset_done(uint8_t port, bool enable = true) volatile throw(std::exception);
+			virtual const port_stat& get_port_stat(uint8_t port) volatile noexcept(false);
+			virtual void port_connect(uint8_t port, usb::data_rate rate) volatile noexcept(false);
+			virtual void port_disconnect(uint8_t port) volatile noexcept(false);
+			virtual void port_disable(uint8_t port) volatile noexcept(false);
+			virtual void port_resumed(uint8_t port) volatile noexcept(false);
+			virtual void port_overcurrent(uint8_t port, bool set) volatile noexcept(false);
+			virtual void port_reset_done(uint8_t port, bool enable = true) volatile noexcept(false);
 		};
 	}
 }

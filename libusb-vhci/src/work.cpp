@@ -38,7 +38,7 @@ namespace usb
 {
 	namespace vhci
 	{
-		work::work(uint8_t port) throw(std::invalid_argument) : port(port), canceled(false)
+		work::work(uint8_t port) noexcept(false) : port(port), canceled(false)
 		{
 			if(port == 0) throw std::invalid_argument("port");
 		}
@@ -52,20 +52,20 @@ namespace usb
 			canceled = true;
 		}
 
-		process_urb_work::process_urb_work(uint8_t port, usb::urb* urb) throw(std::invalid_argument) :
+		process_urb_work::process_urb_work(uint8_t port, usb::urb* urb) noexcept(false) :
 			work(port),
 			urb(urb)
 		{
 			if(!urb) throw std::invalid_argument("urb");
 		}
 
-		process_urb_work::process_urb_work(const process_urb_work& work) throw(std::bad_alloc) :
+		process_urb_work::process_urb_work(const process_urb_work& work) noexcept(false) :
 			usb::vhci::work(work),
 			urb(new usb::urb(*work.urb))
 		{
 		}
 
-		process_urb_work& process_urb_work::operator=(const process_urb_work& work) throw(std::bad_alloc)
+		process_urb_work& process_urb_work::operator=(const process_urb_work& work) noexcept(false)
 		{
 			usb::vhci::work::operator=(work);
 			delete urb;
@@ -78,13 +78,13 @@ namespace usb
 			delete urb;
 		}
 
-		cancel_urb_work::cancel_urb_work(uint8_t port, uint64_t handle) throw(std::invalid_argument) :
+		cancel_urb_work::cancel_urb_work(uint8_t port, uint64_t handle) noexcept(false) :
 			work(port),
 			handle(handle)
 		{
 		}
 
-		port_stat_work::port_stat_work(uint8_t port, const port_stat& stat) throw(std::invalid_argument) :
+		port_stat_work::port_stat_work(uint8_t port, const port_stat& stat) noexcept(false) :
 			work(port),
 			stat(stat),
 			trigger_flags(0)
@@ -93,7 +93,7 @@ namespace usb
 
 		port_stat_work::port_stat_work(uint8_t port,
 		                               const port_stat& stat,
-		                               const port_stat& prev) throw(std::invalid_argument) :
+		                               const port_stat& prev) noexcept(false) :
 			work(port),
 			stat(stat),
 			trigger_flags(0)
