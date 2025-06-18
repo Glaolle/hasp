@@ -4,8 +4,7 @@ Requires=aksusbd.service
 After=network.target aksusbd.service
 
 [Service]
-Type=oneshot
-RemainAfterExit=yes
+Type=forking
 ExecStart=/usr/sbin/hasplm -c /etc/haspd/hasplm.conf
 
 [Install]
