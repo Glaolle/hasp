@@ -936,7 +936,11 @@ static int vhci_hcd_probe(struct platform_device *pdev)
 	return retval;
 }
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 11, 0)
+static int vhci_hcd_remove(struct platform_device *pdev)
+#else
 static void vhci_hcd_remove(struct platform_device *pdev)
+#endif
 {
 	unsigned long flags;
 	struct usb_hcd *hcd;
@@ -987,7 +991,9 @@ static void vhci_hcd_remove(struct platform_device *pdev)
 		vdev->ifc->destroy(vhcidev_to_ifc(vdev));
 	}
 
-	//return 0;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 11, 0)
+	return 0;
+#endif
 }
 
 static int vhci_hcd_suspend(struct platform_device *pdev, pm_message_t state)
