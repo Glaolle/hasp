@@ -64,7 +64,7 @@ CONF_H = conf/usb-vhci.config.h
 # must be in /usr/src/linux-headers-$(KVERSION_NAME)-common/include/linux/usb/hcd.h (нужно искать в /usr/src/linux-headers-$(KVERSION_NAME)-common/include/linux/usb/hcd.h)
 
 # Dir list for find hcd.h with space split (Список каталогов для поиска hcd.h разделенный пробелами)
-DIRS_TO_HCDH := /usr/src/linux-headers-$(KVERSION_NAME)*/include/linux/usb $(PWD)/linux/$(KVERSION_VERSION).$(KVERSION_PATCHLEVEL).$(KVERSION_SUBLEVEL)/drivers/usb/core $(KDIR)/drivers/usb/core $(KDIR)/include/linux/usb
+DIRS_TO_HCDH := /usr/src/linux-headers-$(KVERSION_NAME)*/include/linux/usb /usr/src/linux-headers-$(firstword $(KVERSION_WORDS))-*/include/linux/usb $(PWD)/linux/$(KVERSION_VERSION).$(KVERSION_PATCHLEVEL).$(KVERSION_SUBLEVEL)/drivers/usb/core $(KDIR)/drivers/usb/core $(KDIR)/include/linux/usb
 
 # First founded hcd.h in list (Берем первый файл из всех существующих файлов в каталогах)
 PATH_TO_HCDH := $(firstword $(foreach dir,$(DIRS_TO_HCDH),$(wildcard $(dir)/hcd.h)))
@@ -111,11 +111,11 @@ install: install-module install-devel
 
 clean-conf:
 	-rm -f $(CONF_H)
-	-rmdir conf/
+	-rm -rf conf/
 .PHONY: clean-conf
 
 clean: clean-test clean-conf
-	-rm -f *.o *.ko .*.cmd .*.flags *.mod .*.d *.mod.c Module.symvers Module.markers modules.order
+	-rm -f .*.d .*.o *.o *.ko .*.cmd .*.flags *.mod *.mod.c Module.symvers Module.markers modules.order
 	-rm -rf .tmp_versions/
 	-rm -rf $(TMP_MKDIST_ROOT)/
 .PHONY: clean
@@ -155,7 +155,7 @@ testcc: clean-test
 .PHONY: testcc
 
 clean-test:
-	-rm -f test/*.o test/*.ko test/.*.cmd test/.*.flags test/*.mod.c test/Module.symvers test/Module.markers test/modules.order
+	-rm -f test/.*.d test/.*.o test/*.o test/*.ko test/.*.cmd test/.*.flags test/*.mod test/*.mod.c test/Module.symvers test/Module.markers test/modules.order
 	-rm -rf test/.tmp_versions/
 .PHONY: clean-test
 

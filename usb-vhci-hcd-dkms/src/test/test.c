@@ -70,15 +70,15 @@ static struct usb_hcd testhcd = {
 
 static int __init init(void)
 {
+#ifdef TEST_DEV_BUS_ID
+	const char * foo = dev_name((struct device *)NULL);
+	dev_set_name((struct device *)NULL, foo);
+#endif
+
 	if(usb_disabled()) return -ENODEV;
 
 #ifdef TEST_GIVEBACK_MECH
 	usb_hcd_giveback_urb((struct usb_hcd *)NULL, (struct urb *)NULL, (int)0);
-#endif
-
-#ifdef TEST_DEV_BUS_ID
-	const char * foo = dev_name((struct device *)NULL);
-	dev_set_name((struct device *)NULL, foo);
 #endif
 
 	return 0;
