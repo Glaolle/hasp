@@ -10,7 +10,8 @@ include $(here)linuxdefs.mk
 
 TARGETARCH := $(shell uname -m | sed -e s/i.86/x86/)
 
-KERNSRC ?= /lib/modules/$(shell uname -r)/build
+KVERSION := $(shell uname -r)
+KERNSRC ?= /lib/modules/$(KVERSION)/build
 
 obj-m       := aksparlnx.o
 aksparlnx-y := aksparpub.o api.o
@@ -36,7 +37,7 @@ EXTRA_CFLAGS := $(HLMOD_DEFINES)
 
 default: api.o
 	touch .api.o.cmd
-	$(MAKE) V=1 -C $(KERNSRC) here=$$(pwd)/ SUBDIRS=$$(pwd) M=$(PWD) modules
+	$(MAKE) V=1 -C $(KERNSRC) here=$$(pwd)/ SUBDIRS=$$(pwd) M=$(PWD) KVERSION=$(KVERSION) modules
 	strip --strip-debug --discard-all aksparlnx.ko
 
 api.o: api.o_shipped.x86 api.o_shipped.x86_64
