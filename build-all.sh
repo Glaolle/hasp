@@ -6,7 +6,7 @@ cd ./haspd-aksparlnx-dkms
 debuild -us -uc -tc -b
 cd ..
 
-dpkg-deb --build ./haspd haspd_8.53-ubuntu_amd64.deb
+dpkg-deb --root-owner-group --build ./haspd haspd_8.53-ubuntu_amd64.deb
 
 cd ./usb-vhci-hcd-dkms
 debuild -us -uc -tc -b
