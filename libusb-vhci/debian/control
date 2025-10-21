@@ -9,7 +9,6 @@ Architecture: any
 Multi-Arch: same
 Depends: libusb-vhci (= ${binary:Version}), ${misc:Depends}
 Description: This project consists of a linux kernel driver and some user-mode libraries.
- This project consists of a linux kernel driver and some user-mode libraries.
  They allow a process to create a virtual usb host controller.
  Real or virtual usb devices can be "plugged" into this controller.
 
@@ -20,6 +19,5 @@ Multi-Arch: same
 #Pre-Depends: ${misc:Pre-Depends}
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: This project consists of a linux kernel driver and some user-mode libraries.
- This project consists of a linux kernel driver and some user-mode libraries.
  They allow a process to create a virtual usb host controller.
  Real or virtual usb devices can be "plugged" into this controller.

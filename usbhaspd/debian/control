@@ -1,14 +1,11 @@
 Source: usbhaspd
 Maintainer: Glaolle <glaolle@gmail.com>
 Priority: optional
-Section: Unspecified
+Section: devel
 
 Package: usbhaspd
-Section: Unspecified
-Architecture: any
-Multi-Arch: same
-#Pre-Depends: ${misc:Pre-Depends}
-#Depends: ${misc:Depends}, libusb-vhci, libjansson
-Depends: ${misc:Depends}, libusb-vhci, libjansson4
+Section: devel
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, libusb-vhci, libjansson4
 Description: This project is about Usb hasp emulator on Linux.
  In particular on Debian based platforms.

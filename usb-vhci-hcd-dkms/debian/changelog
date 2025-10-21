@@ -1,4 +1,4 @@
-usb-vhci-hcd-dkms (1.15.1) unstable; urgency=medium
+usb-vhci-hcd-dkms (1.15.1) UNRELEASED; urgency=medium
 
   * Initial release.
 

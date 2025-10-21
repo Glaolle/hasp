@@ -12,11 +12,11 @@ DEB_CONFIGURE_EXTRA_FLAGS = --libdir="\$${prefix}/lib/$(DEB_HOST_MULTIARCH)"
 	dh $@ --with systemd
 
 override_dh_install:
-	cd $(CURDIR)/src && make CFLAGS=-std=gnu99 
+	cd $(CURDIR)/src && make CFLAGS=-std=gnu99
 	dh_install src/usbhaspd.conf /etc/usbhaspd/
-	dh_install src/usbhaspd.service /etc/systemd/system/
+	dh_install src/usbhaspd.service /usr/lib/systemd/system/
 	dh_install src/usbhaspd /usr/bin/
 	dh_install src/dist/Release/GNU-Linux/usbhasp /usr/bin/
-	cd $(CURDIR)/src && make clean 
+	cd $(CURDIR)/src && make clean
 
 #override_dh_auto_clean:

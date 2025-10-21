@@ -9,3 +9,5 @@ DEB_CONFIGURE_EXTRA_FLAGS = --libdir="\$${prefix}/lib/$(DEB_HOST_MULTIARCH)"
 	dh $@
 
 #override_dh_auto_clean:
+override_dh_strip:
+	dh_strip --no-automatic-dbgsym

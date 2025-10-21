@@ -1,11 +1,13 @@
 #!/bin/sh
 
+set -e
+
 case $1 in
   remove) rmmod usb_vhci_hcd
 	  rmmod usb_vhci_iocifc
-	  systemctl stop usbhaspd
-          systemctl disable usbhaspd
           ;;
 esac
+
+#DEBHELPER#
 
 exit 0

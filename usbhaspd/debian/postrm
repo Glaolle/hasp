@@ -1,7 +1,10 @@
 #!/bin/sh
 
+set -e
+
 rmmod usb_vhci_hcd
 rmmod usb_vhci_iocifc
-rm -f /etc/systemd/system/usbhaspd.service
+
+#DEBHELPER#
 
 exit 0

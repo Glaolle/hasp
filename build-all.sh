@@ -17,17 +17,16 @@ sudo dpkg --unpack ./usb-vhci*.deb
 cd ./libusb-vhci
 debuild -us -uc -tc -b
 cd ..
-rm -f *.build *.buildinfo *.changes *.ddeb  *dbgsym*
 sudo dpkg -i ./libusb-vhci*.deb
 
 cd ./usbhaspd
 debuild -us -uc -tc -b
 cd ..
-rm -f *.build *.buildinfo *.changes *.ddeb
 
 cd ./usbhaspinfo
 debuild -us -uc -tc -b
 cd ..
+
 rm -f *.build *.buildinfo *.changes *.ddeb *dbgsym*
 
 sudo apt remove usb-vhci-hcd-dkms --purge -y

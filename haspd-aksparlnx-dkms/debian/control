@@ -3,7 +3,7 @@ Maintainer: Glaolle <glaolle@gmail.com>
 Build-Depends: dkms
 
 Package: haspd-aksparlnx-dkms
-Architecture: all
+Architecture: amd64
 Priority: optional
 Section: kernel
 Depends: dkms (>= 1.95), linux-headers-generic, ${misc:Depends}

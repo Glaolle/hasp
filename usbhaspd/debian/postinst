@@ -1,8 +1,10 @@
 #!/bin/sh
 
+set -e
+
 modprobe usb_vhci_hcd
 modprobe usb_vhci_iocifc
-systemctl enable usbhaspd
-systemctl restart usbhaspd
+
+#DEBHELPER#
 
 exit 0
