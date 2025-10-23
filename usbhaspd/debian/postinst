@@ -2,8 +2,8 @@
 
 set -e
 
-modprobe usb_vhci_hcd
-modprobe usb_vhci_iocifc
+#modprobe usb_vhci_hcd
+#modprobe usb_vhci_iocifc
 
 #DEBHELPER#
 

@@ -6,6 +6,6 @@ Section: devel
 Package: usbhaspd
 Section: devel
 Architecture: amd64
-Depends: ${shlibs:Depends}, ${misc:Depends}, libusb-vhci, libjansson4
+Depends: ${shlibs:Depends}, ${misc:Depends}, libusb-vhci0, libjansson4
 Description: This project is about Usb hasp emulator on Linux.
  In particular on Debian based platforms.

@@ -2,11 +2,11 @@
 
 set -e
 
-case $1 in
-  remove) rmmod usb_vhci_hcd
-	  rmmod usb_vhci_iocifc
-          ;;
-esac
+#case $1 in
+#  remove) rmmod usb_vhci_hcd
+#	  rmmod usb_vhci_iocifc
+#          ;;
+#esac
 
 #DEBHELPER#
 

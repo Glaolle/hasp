@@ -2,8 +2,8 @@
 
 set -e
 
-rmmod usb_vhci_hcd
-rmmod usb_vhci_iocifc
+#rmmod usb_vhci_hcd
+#rmmod usb_vhci_iocifc
 
 #DEBHELPER#
 
