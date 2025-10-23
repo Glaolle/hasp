@@ -3,21 +3,21 @@ Maintainer: Glaolle <glaolle@gmail.com>
 Priority: optional
 Section: libs
 
-Package: libusb-vhci-dev
-Section: libdevel
+Package: libusb-vhci0
 Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Pre-Depends: ${misc:Pre-Depends}
 Multi-Arch: same
-Depends: libusb-vhci (= ${binary:Version}), ${misc:Depends}
 Description: This project consists of a linux kernel driver and some user-mode libraries.
  They allow a process to create a virtual usb host controller.
  Real or virtual usb devices can be "plugged" into this controller.
 
-Package: libusb-vhci
-Section: libs
+Package: libusb-vhci-dev
+Section: libdevel
 Architecture: any
 Multi-Arch: same
-#Pre-Depends: ${misc:Pre-Depends}
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: libusb-vhci0 (= ${binary:Version}), ${misc:Depends}
 Description: This project consists of a linux kernel driver and some user-mode libraries.
  They allow a process to create a virtual usb host controller.
  Real or virtual usb devices can be "plugged" into this controller.
+
