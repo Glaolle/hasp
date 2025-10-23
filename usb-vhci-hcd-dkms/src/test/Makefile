@@ -1,5 +1,6 @@
 TARGET = test
 OBJS = test.o
+ccflags-y = $(EXTRA_CFLAGS)
 
 obj-m      := $(TARGET).o
 

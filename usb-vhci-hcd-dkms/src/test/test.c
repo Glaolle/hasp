@@ -45,7 +45,7 @@
 #ifdef KBUILD_EXTMOD
 #	include INCLUDE_CORE_HCD
 #else
-#	include "../core/hcd.h"
+#	include <linux/usb/hcd.h>
 #endif
 
 #define DRIVER_DESC "test"

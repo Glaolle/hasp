@@ -28,7 +28,7 @@ cd ./usbhaspinfo
 debuild -us -uc -tc -b
 cd ..
 
-#rm -f *.build *.buildinfo *.changes *.ddeb *dbgsym*
+rm -f *.build *.buildinfo *.changes *.ddeb *dbgsym*
 
 sudo apt remove usb-vhci-hcd-dkms --purge -y
 sudo apt remove libusb-vhci-dev --purge -y

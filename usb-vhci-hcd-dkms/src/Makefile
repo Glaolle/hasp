@@ -3,89 +3,42 @@ IOCIFC_TARGET = usb-vhci-iocifc
 OBJS = $(HCD_TARGET).o $(IOCIFC_TARGET).o
 MDIR = drivers/usb/host
 
-#DESTDIR = 
-PREFIX = $(DESTDIR)
-
+PREFIX = 
 BUILD_PREFIX = $(PREFIX)
-#INSTALL_PREFIX = $(PREFIX)
-INSTALL_PREFIX = $(DESTDIR)
-
+INSTALL_PREFIX = $(PREFIX)
 EXTRA_CFLAGS = -DEXPORT_SYMTAB -DKBUILD_EXTMOD -DINCLUDE_CORE_HCD=\"$(PATH_TO_HCDH)\" -DKERNEL_VER=${KVERSION_VERSION}
-
-# Version
-VHCI_HCD_VERSION = 1.15.1
-USB_VHCI_HCD_VERSION = $(VHCI_HCD_VERSION)
-USB_VHCI_IOCIFC_VERSION = $(VHCI_HCD_VERSION)
-
-DIST_DIRS = patch test
-DIST_FILES = AUTHORS ChangeLog COPYING INSTALL Makefile NEWS readme.md TODO dkms.conf usb-vhci-hcd.c usb-vhci-iocifc.c usb-vhci-hcd.h usb-vhci.h usb-vhci-dump-urb.c patch/Kconfig.patch test/Makefile test/test.c
-
-# Source dir for dkms (Каталог исходнико в для dkms)
-DKMS_DST_DIR := $(DESTDIR)/usr/src/$(HCD_TARGET)-$(VHCI_HCD_VERSION)
-
-# makefile dir (Каталог makefile)
-#PWD := $(shell pwd)
+ccflags-y = $(EXTRA_CFLAGS)
+KVERSION := $(shell uname -r)
+KVERSION_WORDS = $(subst -,  ,$(KVERSION))
+KVERSION_LEVELS = $(subst .,  ,$(firstword $(KVERSION_WORDS)))
+KVERSION_VERSION = $(firstword $(KVERSION_LEVELS))
+KVERSION_PATCHLEVEL = $(word 2, $(KVERSION_LEVELS))
+KVERSION_SUBLEVEL = $(word 3, $(KVERSION_LEVELS))
+KVERSION_NAME = $(word 1, $(KVERSION_WORDS))-$(word 2, $(KVERSION_WORDS))
+KDIR = $(BUILD_PREFIX)/lib/modules/$(KVERSION)/build
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 PWD := $(patsubst %/,%,$(dir $(mkfile_path)))
-
-
-# Kernel version (Имя ядра = 5.2.0-0.bpo.2-amd64)
-KVERSION := $(shell uname -r)
-
-# kernel subversions (Версия через make функции)
-# 5.2.0 0.bpo.2 amd64
-KVERSION_WORDS = $(subst -,  ,$(KVERSION))
-# 5 2 0
-KVERSION_LEVELS = $(subst .,  ,$(firstword $(KVERSION_WORDS)))
-# 5
-KVERSION_VERSION = $(firstword $(KVERSION_LEVELS))
-# 2
-KVERSION_PATCHLEVEL = $(word 2, $(KVERSION_LEVELS))
-# 0
-KVERSION_SUBLEVEL = $(word 3, $(KVERSION_LEVELS))
-
-# 5.2.0-0.bpo.2 
-KVERSION_NAME = $(word 1, $(KVERSION_WORDS))-$(word 2, $(KVERSION_WORDS))
-
-# Dir with makefile kernel modules (Каталог с makefile модулей ядра)
-KDIR = $(BUILD_PREFIX)/lib/modules/$(KVERSION)/build
-
+#PWD := $(shell pwd)
 INSTALL_DIR = $(INSTALL_PREFIX)/lib/modules/$(KVERSION)
 DEST = $(INSTALL_DIR)/kernel/$(MDIR)
-
-# Dir kerenl sources (Каталог исходников ядра для патча)
 KSRC = $(KDIR)
-#KSRC = $(HEADERS_DIR)
 
 CONF_H = conf/usb-vhci.config.h
 
-# New find hcd.h in kernel headers (Новый способ поиска hcd.h в заголовках ядра)
+VHCI_HCD_VERSION = 1.15.1
+USB_VHCI_HCD_VERSION = $(VHCI_HCD_VERSION)
+USB_VHCI_IOCIFC_VERSION = $(VHCI_HCD_VERSION)
+DIST_DIRS = patch test
+DIST_FILES = AUTHORS ChangeLog COPYING INSTALL Makefile NEWS readme.md TODO dkms.conf usb-vhci-hcd.c usb-vhci-iocifc.c usb-vhci-hcd.h usb-vhci.h usb-vhci-dump-urb.c patch/Kconfig.patch test/Makefile test/test.c
 
-# must be in /usr/src/linux-headers-$(KVERSION_NAME)-common/include/linux/usb/hcd.h (нужно искать в /usr/src/linux-headers-$(KVERSION_NAME)-common/include/linux/usb/hcd.h)
-
-# Dir list for find hcd.h with space split (Список каталогов для поиска hcd.h разделенный пробелами)
 DIRS_TO_HCDH := /usr/src/linux-headers-$(KVERSION_NAME)*/include/linux/usb /usr/src/linux-headers-$(firstword $(KVERSION_WORDS))-*/include/linux/usb $(PWD)/linux/$(KVERSION_VERSION).$(KVERSION_PATCHLEVEL).$(KVERSION_SUBLEVEL)/drivers/usb/core $(KDIR)/drivers/usb/core $(KDIR)/include/linux/usb
-
-# First founded hcd.h in list (Берем первый файл из всех существующих файлов в каталогах)
 PATH_TO_HCDH := $(firstword $(foreach dir,$(DIRS_TO_HCDH),$(wildcard $(dir)/hcd.h)))
-
-
 
 obj-m := $(OBJS)
 
-# make -C $(KDIR) SUBDIRS=$(PWD) PWD=$(PWD) BUILD_PREFIX=$(BUILD_PREFIX) KDIR=$(KDIR) KVERSION=$(KVERSION) modules
-
 default: $(CONF_H) 
-	
-	
-#	@echo KVERSION=$(KVERSION)
-#	@echo KVERSION_NAME=$(KVERSION_NAME)
-#	@echo KVERSION_VERSION=$(KVERSION_VERSION)
-#	@echo KVERSION_PATCHLEVEL=$(KVERSION_PATCHLEVEL)
-	 
-
 	make -C $(KDIR) M=$(PWD) PWD=$(PWD) BUILD_PREFIX=$(BUILD_PREFIX) KDIR=$(KDIR) KVERSION=$(KVERSION) modules
-#	make -C $(KDIR) M=$(PWD) PWD=$(PWD) BUILD_PREFIX=$(BUILD_PREFIX) KDIR=$(KDIR) KVERSION=$(KVERSION) modules
+	mkdir -vp $(INSTALL_PREFIX)/usr/include/linux && cp -vf usb-vhci.h $(INSTALL_PREFIX)/usr/include/linux/
 .PHONY: default
 .SUFFIXES:
 
@@ -105,17 +58,15 @@ install-devel:
 .PHONY: install-devel
 
 install: install-module install-devel
-	# echo Dest is $(DEST) 
-
 .PHONY: install
 
 clean-conf:
 	-rm -f $(CONF_H)
-	-rm -rf conf/
+	-rmdir conf/
 .PHONY: clean-conf
 
 clean: clean-test clean-conf
-	-rm -f .*.d .*.o *.o *.ko .*.cmd .*.flags *.mod *.mod.c Module.symvers Module.markers modules.order
+	-rm -f *.o *.ko .*.cmd .*.flags *.mod.c Module.symvers Module.markers modules.order
 	-rm -rf .tmp_versions/
 	-rm -rf $(TMP_MKDIST_ROOT)/
 .PHONY: clean
@@ -145,17 +96,14 @@ srcdox: clean-srcdox
 $(CONF_H):
 	$(MAKE) testconfig
 
-#TESTMAKE = make -C $(KDIR) SUBDIRS=$(PWD)/test PWD=$(PWD)/test BUILD_PREFIX=$(BUILD_PREFIX) KDIR=$(KDIR) KVERSION=$(KVERSION) EXTRA_CFLAGS='-Wno-unused $(EXTRA_CFLAGS) $1' modules
-
 TESTMAKE = make -C $(KDIR) M=$(PWD)/test PWD=$(PWD)/test BUILD_PREFIX=$(BUILD_PREFIX) KDIR=$(KDIR) KVERSION=$(KVERSION) EXTRA_CFLAGS='-Wno-unused $(EXTRA_CFLAGS) $1' modules
-
 
 testcc: clean-test
 	$(call TESTMAKE)
 .PHONY: testcc
 
 clean-test:
-	-rm -f test/.*.d test/.*.o test/*.o test/*.ko test/.*.cmd test/.*.flags test/*.mod test/*.mod.c test/Module.symvers test/Module.markers test/modules.order
+	-rm -f test/*.o test/*.ko test/.*.cmd test/.*.flags test/*.mod.c test/Module.symvers test/Module.markers test/modules.order
 	-rm -rf test/.tmp_versions/
 .PHONY: clean-test
 
@@ -312,60 +260,5 @@ dist:
 	(cd $(TMP_MKDIST_ROOT)/; tar -c vhci-hcd-$(VHCI_HCD_VERSION)) | gzip -c >vhci-hcd-$(VHCI_HCD_VERSION).tar.gz
 	-rm -rf $(TMP_MKDIST_ROOT)/
 .PHONY: dist
-
-# Copy sources to dkms dir (Копирует исходники в каталог dkms)
-dkmscopy: dkmsclean
-	# Создать каталог
-	mkdir -p $(DKMS_DST_DIR)
-	# Создать подкаталоги исходников
-	$(foreach dir ,$(DIST_DIRS), mkdir -p $(DKMS_DST_DIR)/$(dir);)
-	# Скопировать исходники
-	$(foreach filename,$(DIST_FILES), cp -T $(PWD)/$(filename) $(DKMS_DST_DIR)/$(filename);)
-
-.PHONY: dkmscopy
-
-# Remove sources from dkms dir (Удаляет исходники из каталога dkms)
-dkmsclean:
-	# Удалить каталог
-	rm -f -r $(DKMS_DST_DIR)
-
-.PHONY: dkmsclean
-
-
-# Add module to dkms (Добавляет модуль в dkms)
-dkmsadd: 
-	# Добавление модуля в dkms
-	dkms add -m $(HCD_TARGET) -v $(VHCI_HCD_VERSION) 
-.PHONY: dkmsadd
-
-# Build dkms module (Собирает модуль в dkms)
-dkmsbuild: 
-	dkms build -m $(HCD_TARGET) -v $(VHCI_HCD_VERSION) -k $(KVERSION)
-.PHONY: dkmsbuild
-
-# Install dkms (Устанавливает модуль в dkms)
-dkmsinstall: 
-	dkms install -m $(HCD_TARGET) -v $(VHCI_HCD_VERSION) -k $(KVERSION)
-.PHONY: dkmsinstall
-
-# Uninstall dkms (Отменяет установку модуля в dkms)
-dkmsuninstall: 
-	dkms uninstall -m $(HCD_TARGET) -v $(VHCI_HCD_VERSION) -k $(KVERSION)
-.PHONY: dkmsuninstall
-
-# Remove dkms (Удаляет модуль из dkms)
-dkmsremove: 
-	dkms remove -m $(HCD_TARGET) -v $(VHCI_HCD_VERSION) --all
-.PHONY: dkmsremove
-
-# Make deb for dkms (Создает deb в dkms)
-deb: 
-	dkms mkdeb -m $(HCD_TARGET) -v $(VHCI_HCD_VERSION) -k $(KVERSION) --source-only
-.PHONY: mkdeb
-
-# Make binary deb (Создает бинарный deb)
-bindeb: 
-	dkms mkbmdeb -m $(HCD_TARGET) -v $(VHCI_HCD_VERSION) -k $(KVERSION)
-.PHONY: mkbmdeb
 
 -include $(KDIR)/Rules.make
