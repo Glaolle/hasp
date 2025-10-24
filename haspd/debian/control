@@ -1,0 +1,24 @@
+Source: haspd
+Section: misc
+Priority: optional
+Maintainer: Glaolle <glaolle@gmail.com>
+Rules-Requires-Root: no
+Build-Depends:
+ debhelper-compat (= 13),
+Standards-Version: 4.7.2
+
+Package: haspd
+#Version: 8.53
+Architecture: amd64
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ libc6-i386,
+Multi-Arch: foreign
+Description: Hardware key protection drivers and license managers
+ HASP - Hardware Against Software Piracy
+ .
+ The package contains
+ * Sentinel LDK runtime supporting Sentinel (HL), HASP 4, and Hardlock keys.
+ .
+ (c) 2022 SafeNet, Inc. All rights reserved.

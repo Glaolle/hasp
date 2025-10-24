@@ -1,9 +1,0 @@
-#!/bin/sh
-
-case $1 in
-  remove) systemctl stop aksusbd hasplm
-          systemctl disable aksusbd hasplm
-          ;;
-esac
-
-exit 0
