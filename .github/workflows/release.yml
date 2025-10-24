@@ -41,9 +41,9 @@ jobs:
           debuild -us -uc -tc -b
           cd ..
 
-	  cd ./haspd
-	  debuild -us -uc -tc -b
-	  cd ..
+          cd ./haspd
+          debuild -us -uc -tc -b
+          cd ..
 
           cd ./usb-vhci-hcd-dkms
           debuild -us -uc -tc -b
